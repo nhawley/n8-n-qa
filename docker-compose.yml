@@ -1,0 +1,30 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=secret
+      - EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
+      - EXECUTIONS_DATA_SAVE_ON_ERROR=all
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+  qa-service:
+    build: ./fastapi-service
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./baselines:/data/baselines
+      - ./reports:/data/reports
+    environment:
+      - BASELINES_DIR=/data/baselines
+      - REPORTS_DIR=/data/reports
+
+volumes:
+  n8n_data:
